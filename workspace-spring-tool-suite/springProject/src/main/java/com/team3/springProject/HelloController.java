@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class HelloController {
 	@GetMapping("hello") // localhost:8080/hello
-	@ResponseBody // 브라우저 화면에 바로 보여줘
 	public String hello() {
-		return "Hello World";
+		return "hello";
 	}
 }
