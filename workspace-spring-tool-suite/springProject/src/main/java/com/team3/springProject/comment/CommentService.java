@@ -7,33 +7,36 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.team3.springProject.DataNotFoundException;
+import com.team3.springProject.post.Post;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 @Service
 public class CommentService {
+    private final CommentRepository commentRepository;
 
-	private final CommentRepository commentRepository;
-
-	public List<Comment> getCommentList(){
-		return this.commentRepository.findAll();
-	}
+    public CommentService(CommentRepository commentRepository) {
+        this.commentRepository = commentRepository;
+    }
+    
+    public List<Comment> getCommentsByPostId(Long postId) {
+        return commentRepository.findByPostId(postId);
+    }
+    
+    public void createComment(Post postId, String content) {
+        Comment comment = new Comment();
+        comment.setPost(postId);
+        comment.setContent(content);
+        comment.setCreatedAt(LocalDateTime.now());
+        //comment.setUsername(username);
+        commentRepository.save(comment);
+    }
 
 	public Comment getComment(Long id) {
-		Optional<Comment> comment = this.commentRepository.findById(id);
+		Optional<Comment> comment=this.commentRepository.findById(id);
 		if(comment.isPresent()) {
 			return comment.get();
-		} else {
+		}else {
 			throw new DataNotFoundException("댓글이 존재하지 않습니다.");
 		}
-	}
-
-	public void createComment(String content) {
-		Comment comment = new Comment();		
-		comment.setContent(content);
-		comment.setCreatedAt(LocalDateTime.now());
-        this.commentRepository.save(comment);
 	}
 	
 	public void delete(Comment comment) {

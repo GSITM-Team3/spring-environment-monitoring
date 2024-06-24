@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout}">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Post List</title>
+	<link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+	<style>
+		.post-image {
+			max-width: 140px;
+			height: 140px;
+		}
+
+		.content-column {
+			width: 50%;
+			/* 내용 컬럼 너비 조정 */
+		}
+
+		.comment-column {
+			width: 30%;
+			/* 댓글 컬럼 너비 조정 */
+		}
+
+		.comment-list-wrapper {
+			max-height: 150px;
+			/* 최대 높이 설정 (약 3개의 댓글 높이) */
+			overflow-y: auto;
+			/* 세로 스크롤바 추가 */
+			padding: 10px;
+
+		}
+
+		.comment {
+			margin-bottom: 3px;
+			/* 댓글 간격 조정 */
+		}
+
+		/* 테이블 크기 고정 */
+		.table-fixed {
+			table-layout: fixed;
+			width: 100%;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container my-3" layout:fragment="content">
+		<h1>Post List</h1>
+		<table class="table table-fixed">
+			<tbody>
+				<tr th:each="post, loop : ${postList}">
+					<td>
+						<img th:src="${post.imagePath}" class="post-image" alt="Post Image">
+						<cite title="Source Title">
+							<p th:text="'#' + ${post.location}"></p>
+						</cite>
+					</td>
+					<td class="content-column">
+						<div>
+							<p>작성자: User1</p>
+							<figure>
+								<blockquote class="blockquote">
+									<a style="text-decoration-line: none;" th:href="@{|/post/detail/${post.id}|}"
+										th:text="${post.content}"></a>
+								</blockquote>
+								<figcaption class="blockquote-footer">
+									<span th:text="${#temporals.format(post.createdAt,'yyyy-MM-dd HH:mm')}"></span>
+								</figcaption>
+							</figure>
+						</div>
+					</td>
+					<td class="comment-column">
+						<form action="/community" method="post" class="form-inline">
+							<input type="hidden" name="postId" th:value="${post.id}">
+							<div class="form-group mr-2 mb-0" style="display: flex;">
+								<textarea class="form-control" id="comment" name="content" rows="1" style="width: 70%"
+									placeholder="댓글을 입력해주세요" required></textarea>
+								<button type="submit" class="btn btn-primary mb-0"
+									style="margin-left: 15px;">등록</button>
+							</div>
+						</form>
+						
+						<div class="comment-list-wrapper">
+							<div class="comment" th:each="comment : ${post.comment}">
+								<!--<th:block th:if="${comment.post.id == post.id}">-->
+									<!--<span th:text="${comment.user.username}"></span>-->
+									<span th:text="${comment.content}"></span>
+									<a th:href="@{|/comment/delete/${comment.id}|}">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+											fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+											<path
+												d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+											<path
+												d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+										</svg>
+									</a>
+								<!--</th:block>-->
+							</div>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<button class="btn btn-primary">
+			<a th:href="@{/post/create}" class="text-light">글쓰기</a>
+		</button>
+	</div>
+</body>
+
+</html>
