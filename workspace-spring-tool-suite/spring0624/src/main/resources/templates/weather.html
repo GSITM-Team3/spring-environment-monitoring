@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Weather Forecast</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://www.gstatic.com/charts/loader.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+	<style>
+		.table td, .table th {
+			width: 150px;
+			max-width: 200px;
+			word-wrap: break-word;
+			overflow-wrap: break-word;
+		}
+	</style>
+</head>
+
+<body>
+<div class="container my-5">
+	<h1 class="text-center mb-4">주간 날씨 정보</h1>
+	<ul class="nav nav-tabs mb-4" id="weatherTabs" role="tablist">
+		<li class="nav-item">
+			<a class="nav-link active" id="jeju-north-tab" data-toggle="tab" href="#jeju-north" role="tab"
+			   aria-controls="jeju-north" aria-selected="true" data-nx="56" data-ny="33">제주도 북부 앞바다</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="jeju-east-tab" data-toggle="tab" href="#jeju-east" role="tab"
+			   aria-controls="jeju-east" aria-selected="false" data-nx="57" data-ny="34">제주도 동부 앞바다</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="jeju-west-tab" data-toggle="tab" href="#jeju-west" role="tab"
+			   aria-controls="jeju-west" aria-selected="false" data-nx="55" data-ny="32">제주도 서부 앞바다</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="jeju-south-tab" data-toggle="tab" href="#jeju-south" role="tab"
+			   aria-controls="jeju-south" aria-selected="false" data-nx="56" data-ny="31">제주도 남부 앞바다</a>
+		</li>
+	</ul>
+	<div class="tab-content" id="weatherTabContent">
+		<div class="tab-pane fade show active" id="jeju-north" role="tabpanel" aria-labelledby="jeju-north-tab">
+			<div id="temperatureChartNorth" class="mb-4"></div>
+			<div>
+				<table class="table table-striped table-responsive">
+					<thead id="temperature-table-header-North"></thead>
+					<tbody id="temperature-table-body-North"></tbody>
+				</table>
+			</div>
+		</div>
+		<div class="tab-pane fade" id="jeju-east" role="tabpanel" aria-labelledby="jeju-east-tab">
+			<div id="temperatureChartEast" class="mb-4"></div>
+			<div>
+				<table class="table table-striped table-responsive">
+					<thead id="temperature-table-header-East"></thead>
+					<tbody id="temperature-table-body-East"></tbody>
+				</table>
+			</div>
+		</div>
+		<div class="tab-pane fade" id="jeju-west" role="tabpanel" aria-labelledby="jeju-west-tab">
+			<div id="temperatureChartWest" class="mb-4"></div>
+			<div>
+				<table class="table table-striped table-responsive">
+					<thead id="temperature-table-header-West"></thead>
+					<tbody id="temperature-table-body-West"></tbody>
+				</table>
+			</div>
+		</div>
+		<div class="tab-pane fade" id="jeju-south" role="tabpanel" aria-labelledby="jeju-south-tab">
+			<div id="temperatureChartSouth" class="mb-4"></div>
+			<div>
+				<table class="table table-striped table-responsive">
+					<thead id="temperature-table-header-South"></thead>
+					<tbody id="temperature-table-body-South"></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<script th:inline="javascript">
+	function getWeatherForecast(nx, ny) {
+		const currentDate = new Date();
+		const baseDate = currentDate.toISOString().slice(0, 10).replace(/-/g, '');
+		const baseTime = '0500';
+		const apiUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=BwRRCTdEQ7idml0%2BdEyFhiztVzt3BtRLE6D3OlrXacWxIVB1E22%2BicHATKLJkbFl9OR6yDfWQpQNqhzpO6HSjQ%3D%3D&numOfRows=435&pageNo=1&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`;
+		$.ajax({
+			url: apiUrl,
+			type: 'GET',
+			success: function (data) {
+				displayWeatherForecast(data.response.body.items.item, nx, ny);
+			},
+			error: function (xhr, status, error) {
+				console.error('Error fetching weather forecast:', error);
+			}
+		});
+	}
+	$(document).ready(function () {
+		google.charts.load('current', {packages: ['corechart', 'table']});
+		google.charts.setOnLoadCallback(function () {
+			getWeatherForecast(56, 33);
+		});
+		$('#weatherTabs a').on('click', function (event) {
+			event.preventDefault();
+			const nx = $(this).data('nx');
+			const ny = $(this).data('ny');
+			getWeatherForecast(nx, ny);
+			$(this).tab('show');
+		});
+	});
+
+	function displayWeatherForecast(weatherData, nx, ny) {
+		const temperatureData = weatherData.filter(item => item.category === 'TMP');
+		const windData = weatherData.filter(item => item.category === 'WSD');
+		const windDirectionData = weatherData.filter(item => item.category === 'VEC');
+		const waveData = weatherData.filter(item => item.category === 'WAV');
+		displayTemperatureChart(temperatureData, nx, ny);
+		displayWindTable(windData, windDirectionData, waveData, nx, ny);
+	}
+
+	function displayTemperatureChart(temperatureData, nx, ny) {
+		const data = new google.visualization.DataTable();
+		data.addColumn('string', '시간');
+		data.addColumn('number', '기온 (°C)');
+		const dateFormat = new Intl.DateTimeFormat('ko-KR', { month: 'numeric', day: 'numeric' });
+
+		let currentDate = '';
+		temperatureData.forEach(function (forecast) {
+			const forecastDate = forecast.fcstDate;
+			const forecastTime = forecast.fcstTime.slice(0, 2) + '시';
+			const formattedDate = dateFormat.format(new Date(forecastDate.slice(0, 4), forecastDate.slice(4, 6) - 1, forecastDate.slice(6, 8)));
+
+			// if (forecastTime === '00시' || currentDate !== forecastDate) {
+			//     data.addRow([{ v: '', f: formattedDate }, null]);
+			//     currentDate = forecastDate;
+			// }
+			data.addRow([formattedDate + '' + forecastTime, parseFloat(forecast.fcstValue)]);
+		});
+
+		const options = {
+			title: '기온 변화',
+			curveType: 'function',
+			legend: { position: 'bottom' },
+			hAxis: {
+				// title: '시간',
+				slantedText: true,
+				slantedTextAngle: 45
+			}
+		};
+		const chartId = `temperatureChart${getTabId(nx, ny)}`;
+		const chart = new google.visualization.LineChart(document.getElementById(chartId));
+		chart.draw(data, options);
+	}
+	function displayWindTable(windData, windDirectionData, waveData, nx, ny) {
+		const tableHeaderId = `temperature-table-header-${getTabId(nx, ny)}`;
+		const tableBodyId = `temperature-table-body-${getTabId(nx, ny)}`;
+		const tableHeader = $(`#${tableHeaderId}`);
+		const tableBody = $(`#${tableBodyId}`);
+		tableHeader.empty();
+		tableBody.empty();
+
+		const dateFormat = new Intl.DateTimeFormat('ko-KR', { month: 'numeric', day: 'numeric' });
+
+		let currentDate = '';
+		let headerRow = $('<tr>');
+		let dateRow = $('<tr>');
+		dateRow.append($('<th>').text('날짜'));
+		headerRow.append($('<th>').text('시간'));
+		windData.forEach(forecast => {
+			const forecastDate = forecast.fcstDate;
+			const forecastTime = forecast.fcstTime.slice(0, 2) + '시';
+			const formattedDate = dateFormat.format(new Date(forecastDate.slice(0, 4), forecastDate.slice(4, 6) - 1, forecastDate.slice(6, 8)));
+
+			if (forecastTime === '00시' || currentDate !== forecastDate) {
+				dateRow.append($('<th>').attr('colspan', '18').text(formattedDate));
+				currentDate = forecastDate;
+			}
+			headerRow.append($('<th>').text(forecastTime));
+		});
+		tableHeader.append(dateRow);
+		tableHeader.append(headerRow);
+
+		const rows = ['풍속 (m/s)', '풍향', '파고 (m)'];
+		const rowData = {
+			'풍속 (m/s)': windData,
+			'풍향': windDirectionData,
+			'파고 (m)': waveData
+		};
+		rows.forEach(row => {
+			const tr = $('<tr>');
+			tr.append($('<td>').text(row));
+			rowData[row].forEach(forecast => {
+				tr.append($('<td>').text(forecast ? forecast.fcstValue : 'N/A'));
+			});
+			tableBody.append(tr);
+		});
+	}
+	function getTabId(nx, ny) {
+		if (nx === 56 && ny === 33) return 'North';
+		else if (nx === 57 && ny === 34) return 'East';
+		else if (nx === 55 && ny === 32) return 'West';
+		else if (nx === 56 && ny === 31) return 'South';
+		return '';
+	}
+</script>
+
+
+</body>
+</html>
