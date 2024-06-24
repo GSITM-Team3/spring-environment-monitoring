@@ -1,38 +1,102 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="UTF-8">
-    <title>해수욕장별 수질 조사</title>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
+	<meta charset="UTF-8">
+	<title>해수욕장별 수질 조사</title>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript" th:inline="javascript">
+		google.charts.load('current', {'packages': ['corechart']});
+		google.charts.setOnLoadCallback(drawChart);
+
+		var selectedBeach = ''; // 선택된 해수욕장을 저장할 변수
 
 		function drawChart() {
-		           var chartData = /*[[${chartData}]]*/ '';
-					console.info(chartData.toString);
-					
-		           if (chartData && chartData.length > 0) {
-		               try {
-		                   var data = google.visualization.arrayToDataTable(chartData);
+			var chartDataJson = /*[[${chartData}]]*/ '[]'; // 서버에서 전달된 JSON 형식의 문자열
 
-		                   var options = {
-		                       title: '해수욕장별 수질 조사',
-		                       legend: { position: 'bottom' }
-		                   };
+			// JSON 문자열을 JavaScript 객체로 파싱
+			var chartData = JSON.parse(chartDataJson);
 
-		                   var chart = new google.visualization.LineChart(document.getElementById('chart'));
-		                   chart.draw(data, options);
-		               } catch (error) {
-		                   console.error('Error drawing chart:', error);
-		               }
-		           } else {
-		               console.error('Received undefined or empty JSON data');
-		           }
-		       }
-		   </script>
+			// chartData가 유효한지 확인하고 그래프 그리기
+			if (chartData && chartData.length > 0) {
+				try {
+					var data = google.visualization.arrayToDataTable(chartData);
+
+					var options = {
+						title: '해수욕장별 수질 조사',
+						legend: {position: 'bottom'}
+					};
+
+					var chart = new google.visualization.LineChart(document.getElementById('chart'));
+
+					chart.draw(data, options);
+				} catch (error) {
+					console.error('Error drawing chart:', error);
+				}
+			} else {
+				console.error('Received undefined or empty JSON data');
+			}
+		}
+
+		function updateChart() {
+			var selectedValue = document.getElementById('beachSelect').value;
+
+			if (selectedValue) {
+				selectedBeach = selectedValue; // 선택된 해수욕장 값을 저장
+
+				// 선택된 해수욕장에 따라 apiUrl1과 apiUrl2의 beachName 파라미터 값을 변경
+				var updatedApiUrl1 = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t?beachName=" + selectedBeach + "&measureItem=대장균";
+				var updatedApiUrl2 = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t?beachName=" + selectedBeach + "&measureItem=장구균";
+
+				// 새로운 URL로 데이터 요청
+				var jsonResponse1 = restTemplate.getForObject(updatedApiUrl1, String.class);
+				var jsonResponse2 = restTemplate.getForObject(updatedApiUrl2, String.class);
+
+				// 기존의 데이터 처리 로직을 그대로 사용하여 업데이트된 데이터로 차트를 다시 그림
+				// 이 부분은 fetchBeachDataForChart() 메서드의 로직을 그대로 사용
+				// chartData 배열을 업데이트하고 drawChart() 함수를 호출하여 차트를 다시 그림
+				// 로직을 여기서 구현해야하나?
+			}
+		}
+	</script>
+	<style>
+		.controls {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 10px;
+		}
+	</style>
 </head>
+
 <body>
-    <div id="chart" style="width: 900px; height: 500px"></div>
+	<div class="controls">
+		<label for="beachSelect">해수욕장 선택:</label>
+		<select id="beachSelect">
+			<option value="">-- 선택하세요 --</option>
+			<option value="곽지">곽지</option>
+			<option value="금능">금능</option>
+			<option value="김녕">김녕</option>
+			<option value="사계">사계</option>
+			<option value="삼양">삼양</option>
+			<option value="세화">세화</option>
+			<option value="소금막">소금막</option>
+			<option value="쇠소깍">쇠소깍</option>
+			<option value="신양섭지">신양섭지</option>
+			<option value="월정">월정</option>
+			<option value="이호테우">이호테우</option>
+			<option value="중문색달">중문색달</option>
+			<option value="평대">평대</option>
+			<option value="표선">표선</option>
+			<option value="하도">하도</option>
+			<option value="함덕">함덕</option>
+			<option value="협재">협재</option>
+			<option value="화순금모래">화순금모래</option>
+		</select>
+		<button onclick="updateChart()">검색</button>
+	</div>
+
+	<div id="chart" style="width: 900px; height: 500px"></div>
 </body>
+
 </html>

@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class BeachService {
 
-	private String apiUrl1 = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t?beachName=금능&measureItem=대장균";
-	private String apiUrl2 = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t?beachName=금능&measureItem=장구균";
+	private String apiUrl1 = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t?beachName=곽지&measureItem=대장균";
+	private String apiUrl2 = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t?beachName=곽지&measureItem=장구균";
 	
 	@Autowired
     private RestTemplate restTemplate;
@@ -53,7 +53,7 @@ public class BeachService {
         } catch (Exception e) {
             // 예외 처리
             e.printStackTrace();
-            return null; // 추후 예외처리 로직 추가
+            return new ArrayList<>(); // 예외 발생 시 빈 리스트 반환
         }
     }
 
