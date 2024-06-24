@@ -1,0 +1,14 @@
+<html layout:decorate="~{layout}">
+
+<div layout:fragment="content" class="container my-3">
+	<div th:each="comment, loop : ${commentList}">
+		<span>유저아이디</span>
+		<a th:text="${comment.content}"></a>
+	</div>
+	<form action="/community" method="post">
+		<textarea name="content" rows="4" cols="50"></textarea><br>
+		<input type="submit" value="전송">
+	</form>
+</div>
+
+</html>

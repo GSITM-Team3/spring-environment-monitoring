@@ -1,0 +1,24 @@
+<html layout:decorate="~{layout}">
+
+<div layout:fragment="content" class="container my-3">
+	<div th:each="comment, loop : ${commentList}">
+		<span>로그인한아이디</span>
+		<a th:text="${comment.content}"></a>
+		<a th:href="@{|/comment/delete/${comment.id}|}">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle"
+				viewBox="0 0 16 16">
+				<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+				<path
+					d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+			</svg>
+		</a>
+	</div>
+	<form action="/community" method="post" class="form-inline">
+	    <div class="form-group mr-2 mb-0" style="display: flex;">
+	        <textarea class="form-control" id="comment" name="content" rows="1" style="width: 30%" placeholder="댓글을 입력해주세요" required></textarea>
+			<button type="submit" class="btn btn-primary mb-0" style="margin-left: 15px;">등록</button>
+		</div>	    
+	</form>
+</div>
+
+</html>

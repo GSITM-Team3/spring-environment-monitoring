@@ -1,0 +1,32 @@
+package com.team3.springProject.comment;
+
+import java.util.List;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import ch.qos.logback.core.model.Model;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@Controller
+public class CommentController {
+
+	private final PostService postService;
+	
+	@GetMapping("/community")
+	public String comment(Model model) {
+		List<Comment> postList = this.postService.getPostList();
+		return "community_form";
+	}
+
+    @PostMapping("/submitForm")
+    public String submitForm(Model model, @RequestParam("content") String content) {
+        model.addAttribute("userContent", content); // 입력된 내용을 모델에 추가하여 뷰로 전달
+        return "community_form"; // submitted.html로 이동
+    }
+}

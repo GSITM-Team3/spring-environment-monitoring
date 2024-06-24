@@ -1,2 +1,0 @@
-<h1 th:text = "${question.subject}"></h1>
-<h1 th:text = "${question.content}"></h1>

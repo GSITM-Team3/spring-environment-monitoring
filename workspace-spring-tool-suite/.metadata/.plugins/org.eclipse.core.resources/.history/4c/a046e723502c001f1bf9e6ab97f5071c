@@ -1,0 +1,14 @@
+package com.mysite.sbb;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+public class HelloController {
+	@GetMapping("hello") //localhost:8080/hello에 들어오면,
+	@ResponseBody
+	public String hello() {
+		return "Hello World"; //브라우저 화면에 "Hello World" 보여라
+	}
+}

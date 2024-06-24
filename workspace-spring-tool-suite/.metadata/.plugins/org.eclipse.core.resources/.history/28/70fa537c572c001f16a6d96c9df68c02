@@ -1,0 +1,9 @@
+package com.mysite.sbb;
+
+@Controller
+public class MainController {
+	@GetMapping("/sbb");
+	public void index() {
+		System.out.println("index");
+	}
+}

@@ -1,0 +1,3 @@
+<html layout:decorate="~{layout}">
+	<h2>커뮤니티</h2>
+</html>

@@ -1,0 +1,12 @@
+html {
+    width: 1500px;
+    margin: 0 auto;
+}
+
+textarea{
+   width: 100%;
+}
+
+input[type=submit]{
+   margin-top: 10px;
+}

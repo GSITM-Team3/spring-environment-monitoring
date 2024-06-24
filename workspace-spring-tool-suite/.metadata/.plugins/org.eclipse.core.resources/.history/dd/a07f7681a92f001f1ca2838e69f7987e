@@ -1,0 +1,11 @@
+<html layout:decorate="~{layout}">
+
+	    <h2>댓글 입력하기</h2>
+	    <form action="/submitComment" method="post">
+	        <textarea name="comment" rows="4" cols="50"></textarea><br><br>
+	        <input type="submit" value="댓글 전송">
+	    </form>
+	    
+	    <h2>입력된 댓글</h2>
+	    <p th:text="${comment}"></p>
+</html>

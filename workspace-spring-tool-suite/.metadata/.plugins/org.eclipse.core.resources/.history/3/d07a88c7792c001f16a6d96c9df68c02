@@ -1,0 +1,10 @@
+package com.mysite.sbb;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface QuestionRepository extends JpaRepository<Question, Integer>{
+	//findBy~
+	//select * from question where subject=?
+	Question findBySubject(String subject); //JPA에서 제공하는 Query 메서드
+	Question findBySubjectAndContent(String subject, String content);
+}
