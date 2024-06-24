@@ -4,26 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
+
 public class BeachService {
 
-	private String apiUrl1 = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t?beachName=곽지&measureItem=대장균";
-	private String apiUrl2 = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t?beachName=곽지&measureItem=장구균";
-	
-	@Autowired
+    private static final String BASE_API_URL = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t";
+    
+    @Autowired
     private RestTemplate restTemplate;
-	
-	private ObjectMapper objectMapper = new ObjectMapper();
-	
-	public List<List<Object>> fetchBeachDataForChart() {
+    
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    public List<List<Object>> fetchBeachDataForChart(String selectedBeach) {
         List<List<Object>> chartData = new ArrayList<>();
 
         try {
+            // API URL 설정
+            String apiUrl1 = BASE_API_URL + "?beachName=" + selectedBeach + "&measureItem=대장균";
+            String apiUrl2 = BASE_API_URL + "?beachName=" + selectedBeach + "&measureItem=장구균";
+
             // 외부 API 호출 및 JSON 응답 받기
             String jsonResponse1 = restTemplate.getForObject(apiUrl1, String.class);
             String jsonResponse2 = restTemplate.getForObject(apiUrl2, String.class);

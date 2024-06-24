@@ -4,32 +4,23 @@
 <head>
 	<meta charset="UTF-8">
 	<title>해수욕장별 수질 조사</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	<script type="text/javascript" th:inline="javascript">
 		google.charts.load('current', {'packages': ['corechart']});
 		google.charts.setOnLoadCallback(drawChart);
 
-		var selectedBeach = ''; // 선택된 해수욕장을 저장할 변수
+		var selectedBeachName = "곽지"; // 초기 선택값 설정
 
-		function drawChart() {
+		function drawChart() { // 초기 그래프, default는 ㄱㄴㄷ 순서 1번 곽지 해수욕장
 			var chartDataJson = /*[[${chartData}]]*/ '[]'; // 서버에서 전달된 JSON 형식의 문자열
 
 			// JSON 문자열을 JavaScript 객체로 파싱
 			var chartData = JSON.parse(chartDataJson);
 
-			// chartData가 유효한지 확인하고 그래프 그리기
 			if (chartData && chartData.length > 0) {
 				try {
-					var data = google.visualization.arrayToDataTable(chartData);
-
-					var options = {
-						title: '해수욕장별 수질 조사',
-						legend: {position: 'bottom'}
-					};
-
-					var chart = new google.visualization.LineChart(document.getElementById('chart'));
-
-					chart.draw(data, options);
+					drawGraph(chartData)
 				} catch (error) {
 					console.error('Error drawing chart:', error);
 				}
@@ -39,24 +30,48 @@
 		}
 
 		function updateChart() {
-			var selectedValue = document.getElementById('beachSelect').value;
+			selectedBeachName = document.getElementById('beachSelect').value; // 선택된 해수욕장 이름 업데이트
 
-			if (selectedValue) {
-				selectedBeach = selectedValue; // 선택된 해수욕장 값을 저장
+			// AJAX POST 요청을 보냅니다.
+			$.ajax({
+				type: "POST", // HTTP 요청 방식 (POST)
+				url: "/beach/select", // 서버 측 API 엔드포인트 URL
+				contentType: "application/json", // 요청의 Content-Type 설정
+				data: JSON.stringify(selectedBeachName), // 서버로 전송할 데이터를 JSON 문자열로 변환
+				dataType: "json", // 서버에서 받을 데이터 타입 설정
+				success: function (response) { // 요청이 성공했을 때 호출될 콜백 함수
+					drawGraph(response); // 서버에서 받아온 데이터를 가지고 차트를 업데이트하는 함수 호출
+					updateSelectedBeachName(selectedBeachName); // 선택된 해수욕장 이름 업데이트
+				},
+				error: function (error) { // 요청이 실패했을 때 호출될 콜백 함수
+					console.error("Error fetching data:", error); // 콘솔에 에러 메시지 출력
 
-				// 선택된 해수욕장에 따라 apiUrl1과 apiUrl2의 beachName 파라미터 값을 변경
-				var updatedApiUrl1 = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t?beachName=" + selectedBeach + "&measureItem=대장균";
-				var updatedApiUrl2 = "https://open.jejudatahub.net/api/proxy/aa7t3a3tabDtbD38a87ta8ttttt388ab/ottooo773btprtrj6p0t1tt0eebjrj3t?beachName=" + selectedBeach + "&measureItem=장구균";
+					// 서버 오류 발생 시 사용자에게 메시지를 표시하고 새로고침을 유도
+					showErrorMessage("서버에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 
-				// 새로운 URL로 데이터 요청
-				var jsonResponse1 = restTemplate.getForObject(updatedApiUrl1, String.class);
-				var jsonResponse2 = restTemplate.getForObject(updatedApiUrl2, String.class);
+				}
+			});
+		}
 
-				// 기존의 데이터 처리 로직을 그대로 사용하여 업데이트된 데이터로 차트를 다시 그림
-				// 이 부분은 fetchBeachDataForChart() 메서드의 로직을 그대로 사용
-				// chartData 배열을 업데이트하고 drawChart() 함수를 호출하여 차트를 다시 그림
-				// 로직을 여기서 구현해야하나?
+		function drawGraph(chartData) {
+			try {
+				var data = google.visualization.arrayToDataTable(chartData);
+
+				var options = {
+					title: '해수욕장별 수질 조사',
+					legend: {position: 'bottom'}
+				};
+
+				var chart = new google.visualization.LineChart(document.getElementById('chart'));
+
+				chart.draw(data, options);
+			} catch (error) {
+				console.error('Error drawing chart:', error);
 			}
+		}
+
+		function updateSelectedBeachName(selectedBeach) {
+			document.getElementById('selectedBeachName').textContent = selectedBeach; // 선택된 해수욕장 이름을 업데이트하는 부분
 		}
 	</script>
 	<style>
@@ -73,7 +88,6 @@
 	<div class="controls">
 		<label for="beachSelect">해수욕장 선택:</label>
 		<select id="beachSelect">
-			<option value="">-- 선택하세요 --</option>
 			<option value="곽지">곽지</option>
 			<option value="금능">금능</option>
 			<option value="김녕">김녕</option>
@@ -96,6 +110,9 @@
 		<button onclick="updateChart()">검색</button>
 	</div>
 
+	<div>
+		<p>선택된 해수욕장: <span id="selectedBeachName">곽지</span></p>
+	</div>
 	<div id="chart" style="width: 900px; height: 500px"></div>
 </body>
 
