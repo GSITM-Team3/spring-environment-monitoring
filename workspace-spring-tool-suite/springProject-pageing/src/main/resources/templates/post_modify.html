@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+
+<head>
+	<meta charset="UTF-8">
+	<title>글 작성</title>
+	<style>
+		#imagePathWrapper {
+			width: 300px;
+			height: 300px;
+			position: relative;
+			overflow: hidden;
+			border: 1px solid #ced4da;
+			display: block;
+			margin: 0 auto;
+		}
+
+		#imagePath {
+			position: absolute;
+			top: 0;
+			left: 0;
+			opacity: 0;
+			width: 100%;
+			height: 100%;
+			cursor: pointer;
+		}
+
+		#imagePreview {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.custom-form {
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		.custom-form .form-group {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.btn-container {
+			display: flex;
+			justify-content: space-between;
+			margin-top: 20px;
+		}
+	</style>
+</head>
+
+<body>
+	<div layout:fragment="content">
+		<div class="container my-3">
+			<h1>글 수정</h1>
+			<form th:action="@{|/post/update/${post.id}|}" method="post" enctype="multipart/form-data"
+				class="custom-form">
+				<div class="mb-3" id="imagePathWrapper">
+					<label for="imagePath" class="form-label" style="display: none;">이미지 파일</label>
+					<input type="file" class="form-control" id="imagePath" name="imageFile"
+						onchange="previewImage(event)">
+					<img id="imagePreview" th:src="@{${post.imagePath}}" alt="이미지 미리 보기">
+				</div>
+				<div class="mb-3 form-group">
+					<label for="location" class="form-label">위치 정보</label>
+					<select class="form-select" id="location" name="location">
+						<option th:text="${post.location}"></option>
+						<option value="곽지">곽지</option>
+						<option value="금능">금능</option>
+						<option value="김녕">김녕</option>
+						<option value="사계">사계</option>
+						<option value="삼양">삼양</option>
+						<option value="세화">세화</option>
+						<option value="소금막">소금막</option>
+						<option value="쇠소깍">쇠소깍</option>
+						<option value="신양섭지">신양섭지</option>
+						<option value="월정">월정</option>
+						<option value="이호테우">이호테우</option>
+						<option value="중문색달">중문색달</option>
+						<option value="평대">평대</option>
+						<option value="표선">표선</option>
+						<option value="하도">하도</option>
+						<option value="함덕">함덕</option>
+						<option value="협재">협재</option>
+						<option value="화순금모래">화순금모래</option>
+					</select>
+				</div>
+				<div class="mb-3 form-group">
+					<label for="content" class="form-label">글 내용</label>
+					<textarea class="form-control" id="content" name="content" rows="5"
+						th:text="${post.content}"></textarea>
+				</div>
+				<div class="btn-container">
+					<button class="btn btn-secondary mt-3">
+						<a th:href="@{/community}" class="text-light" style="text-decoration-line: none">목록으로</a>
+					</button>
+					<button type="submit" class="btn btn-primary">수정하기</button>
+				</div>
+			</form>
+		</div>
+
+		<script>
+			function previewImage(event) {
+				var input = event.target;
+				var reader = new FileReader();
+
+				reader.onload = function () {
+					var imagePreview = document.getElementById('imagePreview');
+					imagePreview.src = reader.result;
+					imagePreview.style.display = 'block';
+				};
+
+				if (input.files && input.files[0]) {
+					reader.readAsDataURL(input.files[0]);
+				}
+			}
+		</script>
+
+
+	</div>
+
+</body>
+
+</html>
