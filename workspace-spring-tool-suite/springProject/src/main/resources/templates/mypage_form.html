@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+
+<head>
+	<title>MyPage</title>
+	<style>
+		.form-container {
+			max-width: 600px;
+			margin: 0 auto;
+			padding: 20px;
+			background-color: #fff;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		}
+
+		.gender label {
+			margin-left: 20px;
+		}
+
+		.gender input {
+			margin-left: 10px;
+		}
+	</style>
+</head>
+
+<body>
+<div class="form-container" layout:fragment="content">
+	<form th:action="@{|/user/mypage/${userTable.loginId}|}" th:object="${userTable}" method="post">
+		<div class="form-group">
+			<label for="username">아이디</label>
+			<input type="text" class="form-control" id="username" th:value="${userTable.loginId}" readonly>
+		</div>
+		<div class="form-group">
+			<label for="currentPassword">현재 비밀번호</label>
+			<input type="password" class="form-control" id="currentPassword">
+		</div>
+		<div class="form-group">
+			<label for="newpassword1">새 비밀번호</label>
+			<input type="password" class="form-control" id="newpassword1" name="newpassword1">
+		</div>
+		<div class="form-group">
+			<label for="newpassword2">새 비밀번호 확인</label>
+			<input type="password" class="form-control" id="newpassword2" name="newpassword2">
+		</div>
+		<div class="form-group">
+			<label for="name">이름</label>
+			<input type="text" class="form-control" id="name" th:field="*{name}">
+		</div>
+		<div class="form-group">
+			<label for="phoneNumber">전화번호</label>
+			<input type="text" class="form-control" id="phoneNumber" th:field="*{phoneNumber}">
+		</div>
+		<div class="form-group gender">
+			<label>성별</label>
+			<div class="form-check form-check-inline">
+				<input class="form-check-input" type="radio" id="male" th:field="*{gender}" value="male" th:checked="${userTable.gender == 'male'}">
+				<label class="form-check-label" for="male">남자</label>
+			</div>
+			<div class="form-check form-check-inline">
+				<input class="form-check-input" type="radio" id="female" th:field="*{gender}" value="female" th:checked="${userTable.gender == 'female'}">
+				<label class="form-check-label" for="female">여자</label>
+			</div>
+		</div>
+		<button type="submit" class="btn btn-primary">회원 정보 수정</button>
+	</form>
+</div>
+</body>
+
+</html>

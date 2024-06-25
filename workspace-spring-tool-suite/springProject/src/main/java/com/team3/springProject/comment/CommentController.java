@@ -1,65 +1,57 @@
 package com.team3.springProject.comment;
 
-import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
-import com.team3.springProject.DataNotFoundException;
 import com.team3.springProject.post.Post;
 import com.team3.springProject.post.PostService;
+import com.team3.springProject.userTable.UserService;
+import com.team3.springProject.userTable.UserTable;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Controller
 public class CommentController {
 
-    private final CommentService commentService;
-    private final PostService postService;
+	private final CommentService commentService;
+	private final PostService postService;
+	private final UserService userService;
 
-    public CommentController(CommentService commentService, PostService postService) {
-        this.commentService = commentService;
-        this.postService = postService;
-    }
-
-    @PostMapping("/community")
-    public String createComment(@RequestParam("postId") Long postId,
-                                @RequestParam("content") String content) {
-        Post post = postService.getPost(postId);
-        if (post != null) {
-            commentService.createComment(post, content);
-        } else {
-            throw new DataNotFoundException("Post not found with id: " + postId);
-        }
-        return "redirect:/community"; 
-    }
-    
-    @PostMapping("/comment/create")
-    public String createComment(@RequestParam("postId") Long postId, @RequestParam("content") String content, Model model) {
-        // 댓글 생성 후 해당 게시물의 댓글 리스트를 다시 가져와서 모델에 추가
-        List<Comment> commentList = commentService.getCommentsByPostId(postId);
-        Post post = postService.getPost(postId);
-
-        // 모델에 댓글 리스트와 게시물을 추가하여 뷰에 전달
-        model.addAttribute("commentList", commentList);
-
-        this.commentService.createComment(post, content);
-        return "community"; // 댓글 생성 후 해당 게시물로 리다이렉트
-    }
-	
-	@GetMapping("/comment/delete/{id}")
-	public String commentDelete(@PathVariable("id") Long id) {
-		Comment comment = this.commentService.getComment(id);
-		if(comment !=null) {
-			this.commentService.delete(comment);
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/community")
+	public String createComment(Model model, @Valid CommentForm commentForm, BindingResult bindingResult,
+			Principal principal) {
+		if (bindingResult.hasErrors()) {
+			return "redirect:/community";
 		}
+
+		Post post = postService.getPost(commentForm.getPostId());
+		UserTable userTable = this.userService.getUser(principal.getName());
+
+		this.commentService.createComment(post, commentForm.getContent(), userTable);
 		return "redirect:/community";
 	}
+
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/comment/delete/{id}")
+	public String deleteComment(Principal principal, @PathVariable("id") Long id) {
+		Comment comment = this.commentService.getComment(id);
+		if (!comment.getUserTable().getLoginId().equals(principal.getName())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
+		}
+		this.commentService.delete(comment);
+		return "redirect:/community";
+	}
+
 }

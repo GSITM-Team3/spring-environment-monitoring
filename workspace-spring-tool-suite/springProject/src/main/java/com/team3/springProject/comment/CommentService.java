@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.team3.springProject.DataNotFoundException;
 import com.team3.springProject.post.Post;
+import com.team3.springProject.userTable.UserTable;
 
 @Service
 public class CommentService {
@@ -21,12 +22,12 @@ public class CommentService {
         return commentRepository.findByPostId(postId);
     }
     
-    public void createComment(Post postId, String content) {
+    public void createComment(Post postId, String content, UserTable userTable) {
         Comment comment = new Comment();
         comment.setPost(postId);
         comment.setContent(content);
         comment.setCreatedAt(LocalDateTime.now());
-        //comment.setUsername(username);
+        comment.setUserTable(userTable);
         commentRepository.save(comment);
     }
 

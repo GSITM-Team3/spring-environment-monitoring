@@ -22,10 +22,7 @@ public class Comment { // 이건 그냥 공부하려고 해본거
 	@Id // 댓글 아이디
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
-	
-	private long userId;
-	// private long postId;
-	
+		
 	@ManyToOne
 	private Post post; // postId..?
 	
@@ -34,7 +31,7 @@ public class Comment { // 이건 그냥 공부하려고 해본거
 	
 	private LocalDateTime createdAt; //글 생성일
 	
-//	@ManyToOne //유저 정보
-//	private UserTable userTable;
+	@ManyToOne //유저 정보
+	private UserTable userTable;
 	
 }

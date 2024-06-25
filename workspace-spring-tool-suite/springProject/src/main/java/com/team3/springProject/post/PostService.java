@@ -1,14 +1,19 @@
 package com.team3.springProject.post;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.team3.springProject.DataNotFoundException;
+import com.team3.springProject.userTable.UserTable;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 
 @RequiredArgsConstructor
 @Service
@@ -33,13 +38,14 @@ public class PostService {
 	}
 	
 	// 게시글 등록
-	public void createPost(String location, String content, String imagePath) {
+	public void createPost(String location, String content, String imagePath, UserTable userTable) {
 		Post post = new Post();
 		
 		post.setLocation(location);
         post.setContent(content);
         post.setImagePath(imagePath);
         post.setCreatedAt(LocalDateTime.now());
+        post.setUserTable(userTable);
         this.postRepository.save(post);
 	}
 	
@@ -64,5 +70,13 @@ public class PostService {
 		} else {
 			throw new DataNotFoundException("comment not found");
 		}
+	}
+
+	// 페이징
+	public Page<Post> getList(int page) {
+		List<Sort.Order> sorts = new ArrayList<>();
+		sorts.add(Sort.Order.desc("createdAt"));
+		PageRequest pageable = PageRequest.of(page, 3, Sort.by(sorts));
+		return this.postRepository.findAllByOrderByCreatedAtDesc(pageable);
 	}
 }

@@ -26,8 +26,8 @@ public class Post {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-//   @ManyToOne //Many: Post, One: userTable
-//   private UserTable userTable;
+	@ManyToOne //Many: Post, One: userTable
+	private UserTable userTable;
 
 	@Column // 위치 정보
 	private String location;

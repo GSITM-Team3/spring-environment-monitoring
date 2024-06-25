@@ -15,6 +15,7 @@ import lombok.Setter;
 @Entity
 public class UserTable {
 
+	
 	@Id 
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;

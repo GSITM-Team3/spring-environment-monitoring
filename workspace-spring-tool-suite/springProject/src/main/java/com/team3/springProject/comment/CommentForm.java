@@ -10,4 +10,6 @@ public class CommentForm {
 
 	@NotEmpty(message="댓글 내용 입력은 필수 항목입니다.")
 	private String content;
+	
+	private Long postId;
 }
