@@ -38,6 +38,15 @@ public class UserService {
 		}
 	}
 
+	public boolean isLoginIdDuplicate(String loginId) {
+        try {
+            return userRepository.findByLoginId(loginId).isPresent();
+        } catch (Exception e) {
+            e.printStackTrace(); // 오류 로그 출력
+            throw e;
+        }
+    }
+	
 	public void updateUser(UserTable userTable, String newPassword, String name, String phoneNumber, String gender) {
 		if (newPassword != null && !newPassword.isEmpty()) {
 			userTable.setPassword(passwordEncoder.encode(newPassword));

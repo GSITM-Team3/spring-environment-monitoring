@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,15 +24,15 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.team3.springProject.comment.Comment;
 import com.team3.springProject.comment.CommentService;
+import com.team3.springProject.like.LikeTableService;
 import com.team3.springProject.userTable.UserService;
 import com.team3.springProject.userTable.UserTable;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-
-import lombok.RequiredArgsConstructor;
 
 //@RequestMapping("/post")
 @RequiredArgsConstructor
@@ -41,11 +43,30 @@ public class PostController {
 	private final String uploadDir = "src/main/resources/static/uploads/";
 	private final CommentService commentService;
 	private final UserService userService;
+	private final LikeTableService likeTableService;
 
 	@GetMapping("/community")
-	public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page) {
+	public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page, Principal principal) {
 		Page<Post> paging = this.postService.getList(page);
 		model.addAttribute("paging", paging);
+
+		UserTable userTable = null;
+		if (principal != null) {
+			String username = principal.getName();
+			userTable = userService.getUser(username);
+		}
+
+		// 각 게시물에 대한 좋아요 여부 체크
+		for (Post post : paging) {
+			boolean loggedInUserLiked = likeTableService.filledLike(post, userTable);
+			post.setLoggedInUserLiked(loggedInUserLiked);
+
+			int likeCount = likeTableService.countLikesByPost(post);
+			post.setLikeCount(likeCount);
+		}
+		model.addAttribute("paging", paging);
+		model.addAttribute("userTable", userTable);
+
 		return "post_list";
 	}
 
@@ -126,7 +147,7 @@ public class PostController {
 	public String postUpdate(@ModelAttribute("postForm") @Valid PostForm postForm, BindingResult bindingResult,
 			@PathVariable("id") Long id, Model model) throws IOException {
 		if (bindingResult.hasErrors()) {
-			return "post_form";
+			return "post_modify";
 		}
 
 		Post post = postService.getPost(id);

@@ -2,106 +2,245 @@
 <html layout:decorate="~{layout}">
 
 <head>
-	<title>SignUp</title>
-	<style>
-		.form-container {
-			max-width: 600px;
-			margin: 0 auto;
-			padding: 20px;
-			background-color: #fff;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		}
+   <title>SignUp</title>
+   <style>
+      .form-container {
+         max-width: 600px;
+         margin: 0 auto;
+         padding: 20px;
+         background-color: #fff;
+         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
 
-		.gender label {
-			margin-left: 20px;
-		}
+      .gender>div:first-of-type {
+         margin-left: 20px;
+      }
 
-		.gender input {
-			margin-left: 10px;
-		}
+      .username-check {
+         display: flex;
+         align-items: center;
+      }
 
-		.username-check {
-			display: flex;
-			align-items: center;
-		}
+      .username-check button {
+         margin-left: 10px;
+      }
 
-		.username-check button {
-			margin-left: 10px;
-		}
+      .username-check span {
+         margin-left: 10px;
+         color: green;
+      }
 
-		.username-check span {
-			margin-left: 10px;
-			color: green;
-		}
-	</style>
+      .text-danger {
+         color: red;
+         font-size: 12px;
+      }
+
+      .success-message {
+         background-color: #d4edda;
+         color: #155724;
+         border-color: #c3e6cb;
+         padding: 10px;
+         margin-top: 20px;
+         border: 1px solid transparent;
+         border-radius: .25rem;
+      }
+
+      .validation-message {
+         color: red;
+         font-size: 12px;
+      }
+   </style>
+
+   <script>
+      // 1. 아이디 유효성 검사 및 중복 확인
+      function checkLoginId() {
+         const loginId = document.getElementById("loginId").value.trim();
+
+         if (loginId === "") {
+            document.getElementById("loginIdValidation").innerText = "아이디를 입력해주세요.";
+            document.getElementById("checkResult").innerText = ""; // 입력란 비워질 때 메시지 초기화
+            return;
+         }
+
+         // 서버에서 아이디 유효성 검사를 위해 fetch를 사용하여 GET 요청
+         fetch('http://localhost:8080/user/signup/check-loginId?loginId=' + loginId)
+            .then(response => {
+               // 서버 응답이 정상적이지 않으면 오류 throw 
+               if (!response.ok) {
+                  throw new Error('Network response was not ok');
+               }
+               // 응답을 텍스트로 반환
+               return response.text();
+            })
+            .then(data => {
+               // 서버에서 받은 데이터를 checkResult 요소에 텍스트로 표시
+               document.getElementById("checkResult").innerText = data;
+               // 유효성 검사 후 메시지 초기화
+               document.getElementById("loginIdValidation").innerText = "";
+            })
+            .catch(error => {
+               // fetch 동작 중 오류가 발생하면 콘솔에 오류를 기록
+               console.error('There has been a problem with your fetch operation:', error);
+            });
+      }
+
+      // 2. 비밀번호 일치 여부 검사
+      function validatePasswordMatch() {
+         const password1 = document.getElementById("password1").value;
+         const password2 = document.getElementById("password2").value;
+
+         // password1, password2 모두 존재하나 불일치할 경우 실행
+         if (password1 && password2 && password1 !== password2) {
+            document.getElementById("passwordMismatch").innerText = "비밀번호가 일치하지 않습니다.";
+         } else {
+            // 그렇지 않으면 passwordMismatch 요소의 텍스트를 비워 초기화
+            document.getElementById("passwordMismatch").innerText = "";
+         }
+      }
+
+      // 3. 올바른 데이터 입력 시 유효성 메시지 초기화
+      function clearValidationMessage(id) {
+         document.getElementById(id).innerText = "";
+      }
+
+      // 4. 전체 폼 유효성 검사
+      function validateForm() {
+         const loginId = document.getElementById("loginId").value;
+         const password1 = document.getElementById("password1").value;
+         const password2 = document.getElementById("password2").value;
+         const name = document.getElementById("name").value;
+         const phoneNumber = document.getElementById("phoneNumber").value;
+         const genderMale = document.getElementById("male").checked;
+         const genderFemale = document.getElementById("female").checked;
+
+         let errorMessage = ""; // 에러 메시지를 담을 변수
+
+         // 아이디 유효성 검사
+         if (!loginId) {
+            errorMessage += "아이디를 입력해주세요.\n"; // 아이디 입력 안했을 때
+         } else if (loginId.length < 6 || loginId.length > 12 || !/^[a-zA-Z0-9]+$/.test(loginId)) {
+            errorMessage += "아이디는 영문, 숫자를 조합하여 6~12자로 입력해주세요.\n"; // 아이디 형식 틀렸을 때
+         }
+
+         // 중복 확인 결과 메시지 (div태그(id: checkResult) 안의 텍스트 추출)
+         const checkResult = document.getElementById("checkResult").innerText;
+         if (checkResult === "" || checkResult === "이미 사용 중인 아이디입니다.") {
+            errorMessage += "아이디 중복 확인을 해주세요.\n";
+         }
+                  
+         // 비밀번호 유효성 검사
+         if (!password1) {
+            errorMessage += "비밀번호를 입력해주세요.\n";
+         } else if (password1.length < 8 || password1.length > 12 || !/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*\W).{8,12}$/.test(password1)) {
+            errorMessage += "비밀번호는 영문, 숫자, 특수문자를 조합하여 8~12자로 입력해주세요.\n";
+         }
+
+         if (password1 && !password2) {
+            errorMessage += "비밀번호 확인을 입력해주세요.\n";
+         }
+
+         if (password1 && password2 && password1 !== password2) {
+            errorMessage += "비밀번호가 일치하지 않습니다.\n";
+         }
+
+         // 이름 유효성 검사
+         if (!name) {
+            errorMessage += "이름을 입력해주세요.\n";
+         }
+
+         // 휴대폰번호 유효성 검사
+         if (!phoneNumber) {
+            errorMessage += "전화번호를 입력해주세요.\n";
+         } else if (!/^\d{11}$/.test(phoneNumber)) {
+            errorMessage += "전화번호는 숫자만 11자로 입력해주세요.\n";
+         }
+
+         if (!genderMale && !genderFemale) {
+            errorMessage += "성별을 선택해주세요.\n";
+         }
+
+         // 모든 필드의 유효성 검사 후 errorMessage가 있을 경우 경고창을 띄우고 폼 제출 중단
+         if (errorMessage !== "") {
+            alert(errorMessage);
+            return false; // 폼 제출 중단
+         }
+
+         var successMessage = `${name}님 반갑습니다!\n이제 Jeju for suffer를 이용해보세요!!`;
+
+         alert(successMessage);
+                     
+         return true; // 폼 제출 허용
+      }
+   </script>
+
 </head>
 
 <body>
-	<div class="container" layout:fragment="content">
-		<div class="form-container">
-			<form th:action="@{/user/signup}" method="post"  th:object="${userCreateForm}">
-				<div class="form-group">
-					<label for="loginId">아이디</label>
-					<div class="loginId-check">
-						<!-- 아이디 입력 필드 -->
-						<input type="text" class="form-control" id="loginId" name="loginId" th:field="*{loginId}"
-							placeholder="아이디를 입력해주세요">
-						<!-- 중복 확인 버튼 -->
-						<button type="button" class="btn btn-secondary" onclick="checkDuplicate()">중복확인</button>
-						<!-- 중복 확인 결과 메시지 -->
-						<span id="duplicateMessage"></span>
-						<!--<span id="duplicateCheckResult" th:if="${duplicateLoginId}" style="color: red;">중복된 아이디입니다.</span>
-						<span id="duplicateCheckResult" th:if="${!duplicateLoginId}" style="color: green;">사용 가능한 아이디입니다.</span>-->
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="password1" class="form-label">비밀번호</label>
-					<!-- 비밀번호 입력 필드 -->
-					<input type="password" th:field="*{password1}" class="form-control" id="password1"
-						placeholder="비밀번호를 입력해주세요">
-				</div>
-				<div class="form-group">
-					<label for="password2" class="form-label">비밀번호 확인</label>
-					<!-- 비밀번호 확인 입력 필드 -->
-					<input type="password" th:field="*{password2}" class="form-control" id="password2"
-						placeholder="비밀번호를 한번 더 입력해주세요">
-					<!-- 비밀번호 불일치 메시지 표시 -->
-					<div th:if="${#fields.hasErrors('password2')}" th:errors="*{password2}" class="text-danger"></div>
+   <div class="container" layout:fragment="content">
+      <div class="form-container">
+         <form th:action="@{/user/signup}" method="post" th:object="${userCreateForm}"
+            onsubmit="return validateForm()">
+            <div class="form-group">
+               <label for="loginId">아이디</label>
+               <div class="loginId-check">
+                  <!-- 아이디 입력 필드 -->
+                  <input type="text" class="form-control" id="loginId" name="loginId" th:field="*{loginId}"
+                     placeholder="아이디 영문 6~12자"
+                     oninput="clearValidationMessage('loginIdValidation'); clearValidationMessage('checkResult')">
+                  <!-- 중복 확인 버튼 -->
+                  <button type="button" class="btn btn-secondary" onclick="checkLoginId()">중복확인</button>
+                  <!-- 중복 확인 결과 메시지 -->
+                  <div id="checkResult" class="validation-message"></div>
+                  <!-- 아이디 유효성 검사 메시지 -->
+                  <div id="loginIdValidation" class="validation-message"></div>
+               </div>
+            </div>
+            <div class="form-group">
+               <label for="password1" class="form-label">비밀번호</label>
+               <!-- 비밀번호 입력 필드 -->
+               <input type="password" th:field="*{password1}" class="form-control" id="password1"
+                  placeholder="비밀번호 영문, 숫자, 특수문자 조합 8~12자" oninput="validatePasswordMatch()">
+            </div>
+            <div class="form-group">
+               <label for="password2" class="form-label">비밀번호 확인</label>
+               <!-- 비밀번호 확인 입력 필드 -->
+               <input type="password" th:field="*{password2}" class="form-control" id="password2"
+                  placeholder="비밀번호 다시 입력" oninput="validatePasswordMatch()">
+               <!-- 비밀번호 불일치 메시지 표시 -->
+               <div id="passwordMismatch" class="text-danger"></div>
+            </div>
+            <div class="form-group">
+               <label for="name" class="form-label">이름</label>
+               <!-- 이름 입력 필드 -->
+               <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="이름 2자 이상">
+            </div>
+            <div class="form-group">
+               <label for="phoneNumber" class="form-label">전화번호</label>
+               <!-- 전화번호 입력 필드 -->
+               <input type="tel" th:field="*{phoneNumber}" class="form-control" id="phoneNumber"
+                  placeholder="핸드폰번호 -없이 입력">
+            </div>
+            <div class="form-group gender">
+               <label>성별</label>
+               <div class="form-check form-check-inline">
+                  <!-- 성별 선택 (남자) -->
+                  <input class="form-check-input" type="radio" id="male" th:field="*{gender}" value="male">
+                  <label class="form-check-label" for="male">남자</label>
+               </div>
+               <div class="form-check form-check-inline">
+                  <!-- 성별 선택 (여자) -->
+                  <input class="form-check-input" type="radio" id="female" th:field="*{gender}" value="female">
+                  <label class="form-check-label" for="female">여자</label>
+               </div>
+            </div>
+            <!-- 회원가입 버튼 -->
+            <button type="submit" class="btn btn-primary">회원가입</button>
+            <!-- 회원가입 성공 메시지 -->
+            <div id="successMessage"></div>
+         </form>
+      </div>
+   </div>
 
-				</div>
-				<div class="form-group">
-					<label for="name" class="form-label">이름</label>
-					<!-- 이름 입력 필드 -->
-					<input type="text" th:field="*{name}" class="form-control" id="name" placeholder="이름을 입력해주세요">
-				</div>
-				<div class="form-group">
-					<label for="phoneNumber" class="form-label">전화번호</label>
-					<!-- 전화번호 입력 필드 -->
-					<input type="tel" th:field="*{phoneNumber}" class="form-control" id="phoneNumber"
-						placeholder="핸드폰 번호를 입력해주세요">
-				</div>
-				<div class="form-group gender">
-					<label>성별</label>
-					<div class="form-check form-check-inline">
-						<!-- 성별 선택 (남자) -->
-						<input class="form-check-input" type="radio" id="male" th:field="*{gender}" value="male">
-						<label class="form-check-label" for="male">남자</label>
-					</div>
-					<div class="form-check form-check-inline">
-						<!-- 성별 선택 (여자) -->
-						<input class="form-check-input" type="radio" id="female" th:field="*{gender}" value="female">
-						<label class="form-check-label" for="female">여자</label>
-					</div>
-				</div>
-				<!-- 회원가입 버튼 -->
-				<button type="submit" class="btn btn-primary">회원가입</button>
-			</form>
-		</div>
-	</div>
-	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-	
 </body>
 
 </html>

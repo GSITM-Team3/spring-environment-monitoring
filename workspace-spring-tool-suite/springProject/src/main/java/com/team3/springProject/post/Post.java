@@ -14,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,5 +45,11 @@ public class Post {
 	@Column // 이미지 경로
 	private String imagePath;
 
-	// select
+	// 추가: 현재 사용자가 이 게시물에 좋아요를 눌렀는지 여부를 나타내는 필드
+	@Transient
+	private boolean loggedInUserLiked;
+
+	// 추가: 현재 이 게시물에 좋아요가 몇개인지 여부
+	@Transient
+	private int likeCount;
 }

@@ -15,7 +15,6 @@ import com.team3.springProject.userTable.UserTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 
-@RequiredArgsConstructor
 @Service
 public class PostService {
 	
@@ -79,4 +78,13 @@ public class PostService {
 		PageRequest pageable = PageRequest.of(page, 3, Sort.by(sorts));
 		return this.postRepository.findAllByOrderByCreatedAtDesc(pageable);
 	}
+	
+	// 좋아요 기능
+    public Optional<Post> getOptionalPost(Long postId) {
+        return this.postRepository.findById(postId);
+    }
+
+    public PostService(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 }

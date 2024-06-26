@@ -27,9 +27,9 @@ public class SecurityConfig {
 						.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
 				.headers(headers -> headers.addHeaderWriter(
 						new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
-				.formLogin(formLogin -> formLogin.loginPage("/user/login").defaultSuccessUrl("/weather"))
+				.formLogin(formLogin -> formLogin.loginPage("/user/login").defaultSuccessUrl("/beach"))
 				.logout(logout -> logout.logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
-						.logoutSuccessUrl("/weather")// 로그아웃 성공하면 루트로 이동.
+						.logoutSuccessUrl("/beach")// 로그아웃 성공하면 루트로 이동.
 						.invalidateHttpSession(true));// 로그아웃하면 생성된 사용자의 세션도 삭제하도록 해라.
 
 		return http.build();
