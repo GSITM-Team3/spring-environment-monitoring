@@ -15,7 +15,7 @@
 <br>
 
 ## 💻 개발환경
-개발 도구 <img src="https://img.shields.io/badge/SpringBoot-58FA58"> <img src="https://img.shields.io/badge/HTML-FF0000"> <img src="https://img.shields.io/badge/CSS-013ADF"> <img src="https://img.shields.io/badge/JavaScript-81BEF7">
+개발 도구 <img src="https://img.shields.io/badge/SpringBoot-58FA58"> <img src="https://img.shields.io/badge/HTML-FF0000"> <img src="https://img.shields.io/badge/CSS-013ADF"> <img src="https://img.shields.io/badge/JavaScript-F7FE2E">
 
 라이브러리 <img src="https://img.shields.io/badge/Lombok-AC58FA"> <img src="https://img.shields.io/badge/thymeleaf-58D3F7"> <img src="https://img.shields.io/badge/security-FA5858"> <img src="https://img.shields.io/badge/jackson-FA8258"> <img src="https://img.shields.io/badge/validation-F4FA58"> <img src="https://img.shields.io/badge/dataformat-58FA58">
 
