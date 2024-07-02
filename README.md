@@ -15,9 +15,9 @@
 
 라이브러리 <img src="https://img.shields.io/badge/Lombok-AC58FA"> <img src="https://img.shields.io/badge/thymeleaf-58D3F7"> <img src="https://img.shields.io/badge/security-FA5858"> <img src="https://img.shields.io/badge/jackson-FA8258"> <img src="https://img.shields.io/badge/validation-F4FA58"> <img src="https://img.shields.io/badge/dataformat-58FA58">
 
-ORM  <img src="https://img.shields.io/badge/JPA-AC58FA"> 
+ORM  <img src="https://img.shields.io/badge/JPA-58FA58"> 
 
-DB  <img src="https://img.shields.io/badge/H2-AC58FA"> 
+DB  <img src="https://img.shields.io/badge/H2-FF0000"> 
 <br>
 
 ## 🙋‍♂️🙋‍♀️ 참고사항
@@ -69,13 +69,10 @@ DB  <img src="https://img.shields.io/badge/H2-AC58FA">
 
 
 ## 📹 시연 영상
-[![Video Lable](http://img.youtube.com/vi/LJhPGPtheq4/0.jpg)](http://youtu.be/LJhPGPtheq4)  
+링크 위치
 이미지를 클릭하면 영상을 시청할 수 있는 링크로 이동됩니다.
 
 <br>
 
 ## 🖥 화면별 기능
-![image](https://github.com/GSITM-Team3/react-traffic-safety/assets/144106932/d1570657-af01-4d3f-a4f5-161d63ba7d4e)
-![image](https://github.com/GSITM-Team3/react-traffic-safety/assets/144106932/881ad2cb-29c4-4e31-83f9-2c8c6a3fbc72)
-![image](https://github.com/GSITM-Team3/react-traffic-safety/assets/144106932/3c416d74-4e29-4b77-a1e1-acfb1f4c77b6)
-![image](https://github.com/GSITM-Team3/react-traffic-safety/assets/144106932/b27133f9-9344-4a1b-beca-f4355515a1bb)
+사진 위치
