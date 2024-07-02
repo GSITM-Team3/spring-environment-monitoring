@@ -81,4 +81,9 @@ DB  <img src="https://img.shields.io/badge/H2-013ADF">
 <br>
 
 ## 🖥 화면별 기능
-사진 위치
+![image](https://github.com/GSITM-Team3/spring-environment-monitoring/assets/144106932/a9c79da1-d590-41ca-bd2f-4d5ee1a8b192)
+![image](https://github.com/GSITM-Team3/spring-environment-monitoring/assets/144106932/04efb51b-cf80-47fd-995c-5ca893f3ad2d)
+![image](https://github.com/GSITM-Team3/spring-environment-monitoring/assets/144106932/454314ba-f7e7-41be-9067-00de14ba25dd)
+![image](https://github.com/GSITM-Team3/spring-environment-monitoring/assets/144106932/04b0d606-3c74-40c2-bf2e-28a195c0dffb)
+![image](https://github.com/GSITM-Team3/spring-environment-monitoring/assets/144106932/4c6c943c-7cf8-4328-9bda-e5b40bd12925)
+![image](https://github.com/GSITM-Team3/spring-environment-monitoring/assets/144106932/4563829f-a5d4-46b5-a385-13b651018350)
