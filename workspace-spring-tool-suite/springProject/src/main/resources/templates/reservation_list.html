@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+	<!-- jQuery -->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+	<!-- iamport.payment.js -->
+	<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+	<title>예약 목록</title>
+
+	<style>
+		.table-bordered th,
+		.table-bordered td {
+			border: 1px solid #dee2e6;
+		}
+
+		.delete-icon {
+			cursor: pointer;
+			margin-left: 10px;
+		}
+	</style>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		$(document).ready(function () {
+			var alertMessage = /*[[${alertMessage}]]*/ '';
+			if (alertMessage.trim().length > 0) {
+				alert(alertMessage);
+			}
+		});
+		/*]]>*/
+	</script>
+	<script th:inline="javascript">
+		var IMP = window.IMP;
+		IMP.init("imp41740615");
+
+		function requestPay(className, userName, price, state, reservationId) {
+			console.log(className, userName, price, state, reservationId);
+			IMP.request_pay({
+				pg: "kakaopay",
+				pay_method: "card",
+				name: className,
+				amount: price,
+				buyer_name: userName,
+			}, function (rsp) { // callback
+				if (rsp.success) {
+					var msg = '결제가 완료되었습니다.';
+					$('#paymentResult').text(msg);
+
+					// 예약 상태 업데이트
+					updateReservationState(reservationId, '결제완료');
+
+				} else {
+					var msg = '결제에 실패하였습니다.';
+					msg += '에러내용 : ' + rsp.error_msg;
+					alert(msg); // 실패 시 메시지 알림
+					$('#paymentResult').text(msg);
+				}
+			});
+		}
+
+		// 예약 상태 업데이트 함수
+		function updateReservationState(reservationId, state) {
+			$.ajax({
+				type: 'GET',  // GET 방식으로 변경
+				url: '/completeReservation',  // 업데이트할 서버 API 주소
+				data: {
+					reservationId: reservationId,  // 예약 ID
+					state: state  // 상태 업데이트
+				},
+				success: function (response) {
+					console.log('Reservation state updated successfully.');
+					location.reload();
+				},
+				error: function (xhr, status, error) {
+					console.error('Error updating reservation state:', error);
+				}
+			});
+		}
+
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+
+		function checkReservationTime() {
+			var now = new Date();
+			/*[# th:each="reservation : ${reservationList}"]*/
+			var createAt = new Date(/*[[${reservation.createAt}]]*/ '');
+			var timeDiff = now - createAt;
+			var minutesDiff = Math.floor(timeDiff / 60000);
+			var state = /*[[${reservation.state}]]*/ '';
+
+			// 예약완료 상태이고 3분이 지났는지 확인
+			if (state === '예약완료' && minutesDiff >= 3) {
+				deleteReservation(/*[[${reservation.id}]]*/ '');
+			}
+			/*[/]*/
+		}
+
+		// 3분마다 체크 (3분 = 180000밀리초)
+		setInterval(checkReservationTime, 1000);
+
+		function deleteReservation(id) {
+			$.ajax({
+				type: 'POST',
+				url: '/user/reservation/delete/' + id,
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function (response) {
+					if (response === 'success') {
+						$('tr[data-id="' + id + '"]').remove();
+						alert('예약이 삭제되었습니다');
+						console.log('예약이 삭제되었습니다.');
+					} else {
+						console.error('예약 삭제에 실패했습니다.');
+					}
+				},
+				error: function (xhr, status, error) {
+					console.error('서버 오류가 발생했습니다:', error);
+				}
+			});
+		}
+
+	</script>
+</head>
+
+<body>
+	<div class="container" layout:fragment="content">
+		<!-- 예약 목록이 비어있을 때 -->
+		<div th:if="${#lists.isEmpty(reservationList)}" class="text-center mt-5">
+			<h3>예약된 정보가 없습니다.</h3>
+		</div>
+		<!-- 예약 목록이 있을 때 -->
+		<table class="table table-striped mt-5" th:unless="${#lists.isEmpty(reservationList)}">
+			<thead>
+				<tr>
+					<th class="text-center">예약일</th>
+					<th class="text-center">클래스명</th>
+					<th class="text-center">예약 정보</th>
+					<th class="text-center">예약 상태</th>
+					<th class="text-center">결제 상태</th>
+					<th class="text-center">예약 취소</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="reservation : ${reservationList}" class="text-center" th:data-id="${reservation.id}"
+					th:data-state="${reservation.state}">
+					<td class="align-middle" th:text="${#temporals.format(reservation.reservationDay, 'yyyy.MM.dd')}">
+					</td>
+					<td class="align-middle" th:text="${reservation.classTable.name}"></td>
+					<td class="align-middle" th:text="${reservation.count} + '명 ' + ${reservation.time}"></td>
+					<td class="align-middle" th:text="${reservation.state}"></td>
+					<td class="align-middle">
+						<button class="btn"
+							style="height: 40px; background-color: transparent; border: 2px solid #17a2b8;"
+							th:if="${reservation.state == '예약완료'}"
+							th:attr="onclick='requestPay(\'' + ${reservation.classTable.name} + '\', \'' + ${reservation.userTable.name} + '\',
+						                         	\'' + (${reservation.count} * ${reservation.classTable.price}) + '\', \'' + ${reservation.state} + '\', \'' + ${reservation.id} + '\')'">
+							결제하기
+						</button>
+						<button class="btn"
+							style="height: 40px; background-color: transparent; border: 2px solid yellow;"
+							th:if="${reservation.state == '결제완료'}">결제완료</button>
+					</td>
+					<td class="align-middle">
+						<button type="button"
+							style="height: 40px; background-color: transparent; border: 2px solid red;"
+							th:if="${reservation.state == '예약완료'}"
+							th:onclick="'deleteReservation(' + ${reservation.id} + ')'">
+							<i class="bi bi-x-circle"></i> 예약취소
+						</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			// 예약 상태가 변경되었을 때
+			$('#paymentResult').bind('DOMSubtreeModified', function () {
+				// 변경된 내용에서 결제 결과 메시지 추출
+				var resultMsg = $(this).text().trim();
+				console.info(resultMsg);
+
+				// reservationId를 태그에서 받아오기 (이 예제에서는 각 예약 항목의 ID를 가져오는 방식을 사용)
+				$('td[id^="reservationState-"]').each(function () {
+					var reservationId = $(this).attr('id').replace('reservationState-', '');
+					var currentReservationState = $(this).text().trim();
+
+					// 예약 상태가 '예약완료'이고 결제가 완료된 경우
+					if (currentReservationState === '예약완료' && resultMsg === '결제가 완료되었습니다.') {
+						updateReservationState(reservationId, '결제완료');
+					}
+				});
+			});
+		});
+	</script>
+</body>
+
+</html>

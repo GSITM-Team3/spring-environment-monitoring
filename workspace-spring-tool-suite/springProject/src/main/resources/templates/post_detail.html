@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout}">
+
+<head>
+	<meta charset="UTF-8">
+	<title>글 조회</title>
+	<link rel="stylesheet" type="text/css" th:href="@{/form.css}">
+</head>
+
+<body>
+	<div layout:fragment="content">
+		<div class="container my-3">
+			<form th:action="@{/post/create}" method="post" enctype="multipart/form-data" class="custom-form">
+				<div class="mb-3" id="imagePathWrapper">
+					<label for="imagePath" class="form-label" style="display: none;">이미지 파일</label>
+					<input type="file" class="form-control" id="imagePath" name="imageFile"
+						onchange="previewImage(event)" style="display: none;">
+					<img th:src="@{${post.imagePath}}" id="imagePreview" alt="이미지 미리 보기">
+				</div>
+				<div class="mb-3 form-group">
+					<label for="location" class="form-label">위치 정보</label>
+					<select class="form-select" id="location" name="location" disabled>
+						<option th:value="${post.location}" th:text="${post.location}"></option>
+						<option value="서울">곽지</option>
+						<option value="경기">금능</option>
+						<option value="부산">김녕</option>
+						<option value="부산">사계</option>
+						<option value="부산">삼양</option>
+						<option value="부산">세화</option>
+						<option value="부산">소금막</option>
+						<option value="부산">쇠소깍</option>
+						<option value="부산">신양섭지</option>
+						<option value="부산">월정</option>
+						<option value="부산">이호테우</option>
+						<option value="부산">중문색달</option>
+						<option value="부산">평대</option>
+						<option value="부산">표선</option>
+						<option value="부산">하도</option>
+						<option value="부산">함덕</option>
+						<option value="부산">협재</option>
+						<option value="부산">화순금모래</option>
+					</select>
+				</div>
+				<div class="mb-3 form-group">
+					<label for="content" class="form-label">글 내용</label>
+					<textarea class="form-control" id="content" name="content" rows="5" readonly
+						th:text="${post.content}"></textarea>
+				</div>
+
+				<div class="btn-container">
+					<button class="btn mt-3"
+						style="height: 40px; background-color: transparent; border: 2px solid #17a2b8;">
+						<a th:href="@{/community}" class="text-dark" style="text-decoration: none;">목록으로</a>
+					</button>
+					<button type="button" class="update btn btn-primary mt-3" th:data-uri="@{|/post/update/${post.id}|}"
+						sec:authorize="isAuthenticated()"
+						th:if="${post.userTable !=null and #authentication.getPrincipal().getUsername()==post.userTable.loginId}"
+						th:text="수정" onclick="handleUpdate()" style="width: 92px;">
+					</button>
+					<button type="button" class="delete btn btn-secondary mt-3"
+						th:data-uri="@{|/post/delete/${post.id}|}" sec:authorize="isAuthenticated()"
+						th:if="${post.userTable !=null and #authentication.getPrincipal().getUsername()==post.userTable.loginId}"
+						th:text="삭제" style="width: 92px; background-color: #ff0000; border: transparent;">
+					</button>
+				</div>
+			</form>
+		</div>
+
+
+		<script>
+			function previewImage(event) {
+				var input = event.target;
+				var reader = new FileReader();
+
+				reader.onload = function () {
+					var imagePreview = document.getElementById('imagePreview');
+					imagePreview.src = reader.result;
+					imagePreview.style.display = 'block'; // 이미지 보이기
+				};
+
+				if (input.files && input.files[0]) {
+					reader.readAsDataURL(input.files[0]); // 파일을 읽어옴
+				}
+			}
+
+			function handleUpdate() {
+				const updateElements = document.getElementsByClassName("update");
+				Array.from(updateElements).forEach(function (element) {
+					element.addEventListener('click', function () {
+						var url = element.getAttribute('data-uri');
+						window.location.href = url;
+					});
+				});
+			}
+
+
+			// 삭제 확인 alert창
+			const delete_elements = document.getElementsByClassName("delete");
+			Array.from(delete_elements).forEach(function (element) {
+				element.addEventListener('click', function () {
+					if (confirm("정말로 삭제하시겠습니까?")) {
+						const uri = this.getAttribute('data-uri');
+						if (uri) {
+							location.href = uri;
+						}
+					}
+				});
+			});
+
+
+		</script>
+
+
+	</div>
+
+</body>
+
+</html>

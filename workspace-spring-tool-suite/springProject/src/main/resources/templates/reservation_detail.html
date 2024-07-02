@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+
+<head>
+	<title>클래스 예약 상세 정보</title>
+	<!-- jQuery, Popper.js, Bootstrap JS 포함 -->
+	<!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<style>
+		.class-image {
+			width: 100%;
+			height: auto;
+		}
+
+		#font {
+			font-weight: bold;
+		}
+	</style>
+	<script type="text/javascript" th:inline="javascript">
+		$(document).ready(function () {
+			// 초기 상태 설정
+			$('#date').val(''); // 날짜 선택 초기화
+			$('#time').val(''); // 시간 선택 초기화
+			updateAvailableCount(); // 초기화면에서는 Ajax 호출 안함
+
+			// 날짜와 시간이 변경될 때마다 호출되는 함수
+			$('#date, #time').change(function () {
+				updateAvailableCount(); // Ajax 호출
+			});
+
+			function updateAvailableCount() {
+				var className = $('#className').val();
+				var date = $('#date').val();
+				var time = $('#time').val();
+
+				console.log("Date:", date, "Time:", time, "ClassName:", className);
+				// 만약 date나 time이 비어있다면 아래 코드를 실행하지 않음
+				if (!date || !time) {
+					return;
+				}
+
+				$.ajax({
+					type: 'GET',
+					url: '/availableCount',
+					data: {
+						className: className,
+						date: date,
+						time: time
+					},
+					success: function (response) {
+						var availableCount = response.availableCount;
+						console.log("availableCount:", availableCount);
+						if (availableCount === 0) {
+							$('#count').html('<option value="">예약 가능한 인원이 없습니다.</option>');
+						} else {
+							updateCountDropdown(availableCount);
+						}
+					},
+					error: function (xhr, status, error) {
+						console.error('Error while fetching available count:', error);
+					}
+				});
+			}
+
+			function updateCountDropdown(count) {
+				var countDropdown = $('#count');
+				countDropdown.empty(); // 기존 옵션 제거
+
+				// 예약 가능한 인원이 0명인 경우
+				if (count === 0) {
+					countDropdown.append($('<option></option>').attr('value', '').text('예약 가능한 인원이 없습니다.').prop('disabled', true).prop('selected', true));
+				} else {
+					for (var i = 1; i <= count; i++) {
+						countDropdown.append($('<option></option>').attr('value', i).text(i));
+					}
+				}
+			}
+		});
+	</script>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container mt-5">
+		<div class="row">
+			<div class="col-md-8 offset-md-2">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="class-title" th:text="${classItem.name}"></h3>
+					</div>
+					<div class="card-body">
+						<div class="text-center mb-3">
+							<img th:src="@{/reservation/{imagePath}(imagePath=${classItem.imagePath})}"
+								class="class-image" alt="Class Image">
+						</div>
+						<h6 id="font" class="text-center">가격: <span th:text="${classItem.price}"></span>원</h6>
+						<form th:action="@{/user/reservation/create}" method="post">
+							<input type="hidden" name="className" id="className" th:value="${classItem.name}">
+							<input type="hidden" name="classId" th:value="${classItem.id}">
+							<div class="form-row">
+								<div class="form-group col-md-4">
+									<label for="date">날짜</label>
+									<select id="date" name="date" class="form-control">
+										<option value="" selected>날짜를 선택해주세요</option>
+										<option th:each="day : ${#numbers.sequence(1, 10)}"
+											th:value="${#temporals.format(#temporals.createNow().plusDays(day), 'yyyy-MM-dd')}"
+											th:text="${#temporals.format(#temporals.createNow().plusDays(day), 'yyyy년 MM월 dd일')}">
+										</option>
+									</select>
+								</div>
+								<div class="form-group col-md-4">
+									<label for="time">시간</label>
+									<select id="time" name="time" class="form-control">
+										<option value="" selected>시간을 선택해주세요</option>
+										<option value="오전">오전</option>
+										<option value="오후">오후</option>
+									</select>
+								</div>
+								<div class="form-group col-md-4">
+									<label for="count">인원</label>
+									<select id="count" name="count" class="form-control">
+										<!-- 스크립트에서 만들 것 -->
+									</select>
+								</div>
+							</div>
+							<div class="text-center">
+								<button class="btn"
+									style="background-color: transparent; border: 2px solid #17a2b8; float: left;">
+									<a th:href="@{/reservation}" class="text-dark"
+										style="text-decoration: none;">목록으로</a>
+								</button>
+								<button type="submit" class="btn btn-primary">예약하기</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

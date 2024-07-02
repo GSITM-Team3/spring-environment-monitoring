@@ -1,0 +1,20 @@
+INSERT INTO Class_Table (name, image_Path, price, create_At, MAX_CAPACITY) 
+VALUES 
+    ('곽지해수욕장 서핑클래스', '곽지서핑.jpg', 10000, CURRENT_DATE,20),
+    ('금능해수욕장 서핑클래스', '금능서핑.jpg', 20000, CURRENT_DATE,20),
+    ('김녕해수욕장 서핑클래스', '김녕서핑.jpg', 30000, CURRENT_DATE,20),
+    ('사계해수욕장 서핑클래스', '사계서핑.jpg', 10000, CURRENT_DATE,20),
+    ('삼양해수욕장 서핑클래스', '삼양서핑.jpg', 20000, CURRENT_DATE,20),
+    ('세화해수욕장 서핑클래스', '세화서핑.jpg', 30000, CURRENT_DATE,20),
+    ('소금막해수욕장 서핑클래스', '소금막서핑.jpg', 10000, CURRENT_DATE,20),
+    ('쇠소깍해수욕장 서핑클래스', '쇠소깍서핑.jpg', 20000, CURRENT_DATE,20),
+    ('신양섭지해수욕장 서핑클래스', '신양섭지서핑.jpg', 30000, CURRENT_DATE,20),
+    ('월정해수욕장 서핑클래스', '월정서핑.jpg', 10000, CURRENT_DATE,20),
+    ('이호테우해수욕장 서핑클래스', '이호테우서핑.jpg', 20000, CURRENT_DATE,20),
+    ('중문색달해수욕장 서핑클래스', '중문색달서핑.jpg', 30000, CURRENT_DATE,20),
+    ('평대해수욕장 서핑클래스', '평대서핑.jpg', 10000, CURRENT_DATE,20),
+    ('표선해수욕장 서핑클래스', '표선서핑.jpg', 20000, CURRENT_DATE,20),
+    ('하도해수욕장 서핑클래스', '하도서핑.jpg', 30000, CURRENT_DATE,20),
+    ('함덕해수욕장 서핑클래스', '함덕서핑.jpg', 10000, CURRENT_DATE,20),
+    ('협재해수욕장 서핑클래스', '협재서핑.jpg', 20000, CURRENT_DATE,20),
+    ('화순금모래해수욕장 서핑클래스', '화순금서핑.jpg', 30000, CURRENT_DATE,20);

@@ -1,0 +1,67 @@
+#imagePathWrapper {
+	width: 300px;
+	/* 원하는 크기로 설정 */
+	height: 300px;
+	/* 너비와 같은 크기로 설정 */
+	position: relative;
+	/* 위치 설정을 위해 상대 위치 설정 */
+	overflow: hidden;
+	/* 내용이 넘치는 경우 숨김 처리 */
+	border: 1px solid #ced4da;
+	/* 테두리 설정 */
+	display: block;
+	/* 블록 요소로 설정하여 가로 정렬을 적용 */
+	margin: 0 auto;
+	/* 가운데 정렬 */
+}
+
+/* 파일 선택(input 태그) 기본 텍스트 숨기기 */
+#imagePath {
+	position: absolute;
+	/* 절대 위치로 설정하여 부모 요소 내에서 위치 조정 */
+	top: 0;
+	/* 부모 요소의 상단에 위치 */
+	left: 0;
+	/* 부모 요소의 왼쪽에 위치 */
+	opacity: 0;
+	/* 투명도를 0으로 설정하여 숨김 */
+	width: 100%;
+	/* 부모 요소의 너비에 맞춤 */
+	height: 100%;
+	/* 부모 요소의 높이에 맞춤 */
+	cursor: pointer;
+	/* 마우스 커서를 포인터로 변경하여 클릭 가능하도록 설정 */
+}
+
+/* 이미지 미리 보기 */
+#imagePreview {
+	display: block;
+	width: 100%;
+	/* 부모 요소의 너비에 맞춤 */
+	height: 100%;
+	/* 부모 요소의 높이에 맞춤 */
+	object-fit: cover;
+	/* 이미지가 요소에 맞춰 보이도록 설정 */
+}
+
+/* 위치 정보 및 글 내용 스타일링 */
+.custom-form {
+	max-width: 600px;
+	/* 폼의 최대 너비 설정 */
+	margin: 50px auto 0;
+	/* 가운데 정렬 */
+}
+
+/* 위치 정보, 글 내용의 가로 정렬 */
+.custom-form .form-group {
+	display: flex;
+	flex-direction: column;
+}
+
+/* 버튼 스타일링 */
+.btn-container {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 20px;
+	/* 버튼 위 여백 설정 */
+}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+   <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+   <title>Jeju for Suffer</title>
+   <style>
+       .navbar {
+           height: 80px;
+       }
+      .navbar-nav .nav-item .nav-link {
+          color: aliceblue !important; 
+      }
+       .navbar-nav .nav-item:hover .nav-link {
+           color: #006666 !important; 
+         font-weight: bold;
+       }
+       .container-fluid .navbar-brand {
+           color: white;
+           text-decoration: none;
+       }
+       .container-fluid .navbar-brand:hover {
+           color: white !important; 
+       }
+       .form-control {
+           resize: none;
+       }
+   </style>
+</head>
+
+<body>
+   <nav th:fragment="navbarFragment" class="navbar navbar-expand-lg navbar-light bg-info border-bottom">
+      <div class="container-fluid">
+         <a class="navbar-brand fw-bold" th:href="@{/beach}" style="font-size: 35px;">Jeju for Suffer</a>
+         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+         </button>
+         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0" style="font-size: 18px;">
+               <li class="nav-item">
+                  <a class="nav-link" th:href="@{/weather}">실시간 날씨 정보</a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link" th:href="@{/community}">거기어때</a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link" th:href="@{/reservation}">클래스 예약</a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link" sec:authorize="isAuthenticated()"
+                     th:href="@{/user/reservation/list}">예약 리스트</a>
+               </li>
+               <li class="nav-item d-flex">
+                  <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/user/login}">로그인</a>
+                  <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/user/logout}">로그아웃</a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link" sec:authorize="isAuthenticated()"
+                     th:href="@{/user/mypage/{username}(username=${#authentication.principal.username})}">내 정보</a>
+               </li>
+            </ul>
+         </div>
+      </div>
+   </nav>
+   <!-- 기본 템플릿 안에 삽입될 내용 Start -->
+   <th:block layout:fragment="content"></th:block>
+   <!-- 기본 템플릿 안에 삽입될 내용 End -->
+   <!-- 자바스크립트 Start -->
+   <th:block layout:fragment="script"></th:block>
+   <!-- 자바스크립트 End -->
+</body>
+
+</html>

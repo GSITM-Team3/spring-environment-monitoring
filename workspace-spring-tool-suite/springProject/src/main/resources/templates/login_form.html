@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+
+<head>
+	<title>로그인</title>
+	<style>
+		.login-container {
+			background-color: #fff;
+			padding: 20px;
+			border-radius: 8px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			max-width: 600px;
+			margin: 0 auto;
+			margin-top: 50px;
+		}
+
+		.login-container h1 {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+
+		.login-container label {
+			display: block;
+			margin-bottom: 5px;
+		}
+
+		.login-container input {
+			width: 100%;
+			padding: 10px;
+			margin-bottom: 15px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}
+
+		.login-container button {
+			width: 100%;
+			padding: 10px;
+			background-color: #007bff;
+			color: #fff;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+		}
+
+		.login-container button:hover {
+			background-color: #0056b3;
+		}
+
+		.signup-link {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-top: 10px;
+		}
+
+		.signup-link a {
+			color: #007bff;
+			text-decoration: none;
+		}
+
+		.signup-link a:hover {
+			text-decoration: underline;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container" layout:fragment="content">
+		<div class="login-container">
+			<h1>Jeju for suffer</h1>
+			<form th:action="@{/user/login}" method="post">
+				<div th:if="${param.error}">
+					<div class="alert alert-danger">
+						사용자ID 또는 비밀번호를 확인해 주세요.
+					</div>
+				</div>
+				<div class="mb-3">
+					<label for="username">아이디</label>
+					<input type="text" id="username" name="username" placeholder="아이디를 입력하세요" class="form-control">
+				</div>
+				<div class="mb-3">
+					<label for="password">비밀번호</label>
+					<input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" class="form-control">
+				</div>
+				<button type="submit" class="btn btn-primary">로그인</button>
+			</form>
+			<div class="signup-link">
+				<span>계정이 없으신가요?</span>
+				<a href="/user/signup">가입하기</a>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

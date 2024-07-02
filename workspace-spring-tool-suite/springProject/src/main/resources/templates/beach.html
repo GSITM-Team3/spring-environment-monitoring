@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+
+<head>
+	<title>해수욕장별 수질 조사</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="https://www.gstatic.com/charts/loader.js"></script>
+	<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2c269ce526a5774dcd44dc4946d126fc"></script>
+	<script type="text/javascript" th:inline="javascript">
+		var selectedBeachName = "곽지"; // 초기 선택값 설정
+		var csrfToken = /*[[${_csrf.token}]]*/ ''; // CSRF 토큰 가져오기
+
+		google.charts.load('current', {'packages': ['corechart']});
+		google.charts.setOnLoadCallback(updateChart);
+
+		function updateChart() {
+			var selectedBeachName = document.getElementById('beachSelect').value;
+
+			$.ajax({
+				type: "POST",
+				url: "/beach/select",
+				contentType: "application/json",
+				data: JSON.stringify(selectedBeachName),
+				dataType: "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader("X-CSRF-TOKEN", csrfToken);
+				},
+				success: function (response) {
+					if (response && response.length > 0) {
+						drawGraph(response);
+						updateSelectedBeachName(selectedBeachName);
+						updateMapMarker(selectedBeachName);
+						//displayChartImage(selectedBeachName);
+					} else {
+						//showErrorMessage("해당 해수욕장에 대한 데이터가 없습니다.");
+						updateSelectedBeachName(selectedBeachName);
+						updateMapMarker(selectedBeachName);
+						displayChartImage(selectedBeachName);
+					}
+				},
+				error: function (error) {
+					console.error("Error fetching data:", error);
+					showErrorMessage("서버에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+					updateSelectedBeachName(selectedBeachName);
+					updateMapMarker(selectedBeachName);
+					displayChartImage(selectedBeachName);
+				}
+			});
+		}
+
+		function drawGraph(chartData) {
+			try {
+				var data = google.visualization.arrayToDataTable(chartData);
+
+				var options = {
+					title: '해수욕장별 수질 조사',
+					legend: {position: 'bottom'}
+				};
+
+				var chart = new google.visualization.LineChart(document.getElementById('chart'));
+
+				chart.draw(data, options);
+			} catch (error) {
+				displayChartImage(selectedBeachName);
+			}
+		}
+
+		function displayChartImage(selectedBeach) {
+			var beachImage = '/images/' + selectedBeach + '.jpg'; // 이미지 경로 설정
+
+			document.getElementById('chart').innerHTML = '<img src="' + beachImage + '" style="max-width: 100%; height: auto;">';
+		}
+
+		function updateSelectedBeachName(selectedBeach) {
+			document.getElementById('selectedBeachName').textContent = selectedBeach;
+		}
+
+		function showErrorMessage(message) {
+			alert(message);
+		}
+
+		// Function to initialize map and marker
+		var map;
+		var marker;
+
+		function initMap() {
+			var mapOptions = {
+				center: new kakao.maps.LatLng(33.3617, 126.5292),
+				level: 10
+			};
+
+			map = new kakao.maps.Map(document.getElementById('map'), mapOptions);
+			updateMapMarker(selectedBeachName);
+		}
+
+		function updateMapMarker(selectedBeach) {
+			$.ajax({
+				type: "GET",
+				url: "/beach/coordinates",
+				data: {beachName: selectedBeach},
+				success: function (response) {
+					if (response && response.latitude !== undefined && response.longitude !== undefined) {
+						var beachCoords = new kakao.maps.LatLng(response.latitude, response.longitude);
+
+						if (marker) {
+							marker.setMap(null);
+						}
+
+						marker = new kakao.maps.Marker({
+							position: beachCoords,
+							map: map
+						});
+					} else {
+						alert("해당 해수욕장의 위치 정보를 가져오는데 실패했습니다.");
+					}
+				},
+				error: function (error) {
+					alert("해수욕장의 위치 정보를 가져오는 도중 오류가 발생했습니다.");
+				}
+			});
+		}
+	</script>
+	<style>
+		.controls {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 10px;
+		}
+
+		#map {
+			width: 800px;
+			height: 700px;
+		}
+
+		#chartDescription p {
+			color: black;
+			/* 기본 텍스트 색상 */
+			font-style: italic;
+			width: 700px;
+		}
+
+		#chartDescription p .bacteria {
+			font-weight: bold;
+		}
+
+		#chartDescription p .janggu {
+			color: red;
+			font-weight: bold;
+		}
+
+		#chartDescription p .daejang {
+			color: blue;
+			font-weight: bold;
+		}
+	</style>
+</head>
+
+<body onload="initMap()">
+	<div layout:fragment="content" class="d-flex">
+		<div>
+			<div class="controls">
+				<label for="beachSelect">해수욕장 선택:</label>
+				<select id="beachSelect" onchange="updateChart()">
+					<option value="곽지">곽지</option>
+					<option value="금능">금능</option>
+					<option value="김녕">김녕</option>
+					<option value="사계">사계</option>
+					<option value="삼양">삼양</option>
+					<option value="세화">세화</option>
+					<option value="소금막">소금막</option>
+					<option value="쇠소깍">쇠소깍</option>
+					<option value="신양섭지">신양섭지</option>
+					<option value="월정">월정</option>
+					<option value="이호테우">이호테우</option>
+					<option value="중문색달">중문색달</option>
+					<option value="평대">평대</option>
+					<option value="표선">표선</option>
+					<option value="하도">하도</option>
+					<option value="함덕">함덕</option>
+					<option value="협재">협재</option>
+					<option value="화순금모래">화순금모래</option>
+				</select>
+			</div>
+			<div>
+				<span id="selectedBeachName" style="display: none;">곽지</span>
+			</div>
+			<div id="chart" style="width: 700px; height: 500px"></div>
+			<div id="chartDescription" style="margin-top: 20px; font-style: italic; width: 700px;">
+				<p>
+					 <span class="janggu">장구균은 100CFU/100mL 이하</span>,  <span class="daejang">대장균은 500CFU/100mL 이하</span>
+					적합 범위입니다.
+				</p>
+			</div>
+		</div>
+		<div id="map"></div>
+	</div>
+</body>
+
+<script>
+	function updateChart() {
+		var selectedBeach = document.getElementById('beachSelect').value;
+		selectedBeachName = selectedBeach;
+		updateMapMarker(selectedBeach);
+		displayChartImage(selectedBeach);
+	}
+</script>
+
+</html>
