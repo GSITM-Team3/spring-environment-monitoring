@@ -29,7 +29,7 @@ DB  <img src="https://img.shields.io/badge/H2-013ADF">
 <br>
 
 ## 🙋‍♂️🙋‍♀️ 참고사항
-1. 서핑클래스 db 초기 설정을 위하여 h2-console에서 첨부하는 파일의 쿼리문을 입력해주세요.
+1. 서핑클래스 db 초기 설정을 위하여 respository에 첨부되어 있는 "db 초기 insert.txt"파일의 쿼리문을 h2-console에 입력해주세요.
    
 <br>
 
