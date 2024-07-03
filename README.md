@@ -75,7 +75,8 @@ DB  <img src="https://img.shields.io/badge/H2-013ADF">
 
 
 ## 📹 시연 영상
-링크 위치
+[![Video Label](http://img.youtube.com/vi/VZuTpQDN75k/0.jpg)](https://youtu.be/VZuTpQDN75k)
+
 이미지를 클릭하면 영상을 시청할 수 있는 링크로 이동됩니다.
 
 <br>
