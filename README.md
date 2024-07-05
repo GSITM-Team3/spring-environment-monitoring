@@ -45,7 +45,7 @@ DB  <img src="https://img.shields.io/badge/H2-013ADF">
 - 이미지 첨부가 가능한 게시판 CRUD
 - 사용자 ID, 해수욕장 위치에 따른 검색 기능
 - 댓글, 좋아요 기능
-- Pagenation
+- Pagination
 ### 4. 서핑클래스 예약
 - 해수욕장에 따른 서핑클래스 예약 서비스 제공
 - 예약 확인 및 결제 기능
